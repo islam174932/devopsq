@@ -1,19 +1,71 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Azure DevOps Pipeline Configuration
+# This pipeline demonstrates basic CI setup with common best practices
 
 trigger:
-- master
+  branches:
+    include:
+    - master
+    - develop
+    - feature/*
+    - release/*
+  paths:
+    exclude:
+    - README.md
+    - docs/*
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  buildConfiguration: 'Release'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+- stage: Build
+  displayName: 'Build and Test'
+  jobs:
+  - job: BuildJob
+    steps:
+    - checkout: self
+      fetchDepth: 1
+      clean: true
+      
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK'
+      inputs:
+        version: '6.x'
+        
+    - script: |
+        echo "Starting build process..."
+        echo "Current directory: $(pwd)"
+        echo "Build configuration: $(buildConfiguration)"
+      displayName: 'Initialize Build'
+      
+    - script: |
+        echo "Running unit tests..."
+        # Add your test commands here
+        # Example: dotnet test
+      displayName: 'Run Tests'
+      
+    - script: |
+        echo "Building artifacts..."
+        # Add your build commands here
+        # Example: dotnet build --configuration $(buildConfiguration)
+      displayName: 'Build Project'
+      
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Build Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+      condition: succeeded()
+
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/*.trx'
+        searchFolder: '$(Agent.TempDirectory)'
+      condition: succeededOrFailed()
