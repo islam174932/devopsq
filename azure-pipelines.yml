@@ -1,68 +1,18 @@
 # Azure DevOps Pipeline Configuration
-# This pipeline demonstrates basic CI setup with common best practices
-
 trigger:
-  branches:
-    include:
-    - master
-    - develop
-    - feature/*
-    - release/*
-  paths:
-    exclude:
-    - README.md
-    - docs/*
+- master
 
 pool:
-  vmImage: ubuntu-latest
+  name: testpool  # Using the custom agent pool you created
 
-variables:
-  buildConfiguration: 'Release'
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-  DOTNET_CLI_TELEMETRY_OPTOUT: true
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
 
-stages:
-- stage: Build
-  displayName: 'Build and Test'
-  jobs:
-  - job: BuildJob
-    steps:
-    - checkout: self
-      fetchDepth: 1
-      clean: true
-      
-    - task: UseDotNet@2
-      displayName: 'Use .NET SDK'
-      inputs:
-        version: '6.x'
-        
-    - script: |
-        echo "Starting build process..."
-        echo "Current directory: $(pwd)"
-        echo "Build configuration: $(buildConfiguration)"
-      displayName: 'Initialize Build'
-      
-    - script: |
-        echo "Running unit tests..."
-        # Add your test commands here
-        # Example: dotnet test
-      displayName: 'Run Tests'
-      
-    - script: |
-        echo "Building artifacts..."
-        # Add your build commands here
-        # Example: dotnet build --configuration $(buildConfiguration)
-      displayName: 'Build Project'
-      
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Build Artifacts'
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
-      condition: succeeded()
-
-    - task: PublishTestResults@2
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
       displayName: 'Publish Test Results'
       inputs:
         testResultsFormat: 'VSTest'
