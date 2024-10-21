@@ -20,24 +20,3 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
-
-- task: SonarCloudAnalyze@1  # Code analysis step
-  inputs:
-    sonarCloud: 'SonarCloudServiceConnection'  # Replace with your service connection
-    organization: 'your-organization'  # Replace with your organization
-    projectKey: 'your-project-key'  # Replace with your project key
-    projectName: 'your-project-name'  # Replace with your project name
-
-- task: PublishBuildArtifacts@1  # Publish build artifacts
-  inputs:
-    PathtoPublish: 'target'  # Directory where Maven outputs artifacts
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
-
-- task: AzureWebApp@1  # Deploy to Azure Web App (if applicable)
-  inputs:
-    azureSubscription: 'your-azure-subscription'  # Replace with your Azure subscription
-    appName: 'your-app-name'  # Replace with your app name
-    package: '$(Pipeline.Workspace)/drop/*.war'  # Path to the WAR file
-
-
