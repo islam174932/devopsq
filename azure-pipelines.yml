@@ -6,8 +6,7 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'Default'  # Set to Default image
+pool: 'Default'  # Set to Default image
 
 steps:
 - task: Maven@3
